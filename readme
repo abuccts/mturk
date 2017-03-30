@@ -1,0 +1,17 @@
+wrapper for mturk
+=================
+
+installation
+------------
+
+	git clone https://github.com/abuccts/mturk.git
+	python -m pip install -r requirements.txt
+	cp config.example.json config.json && vi config.json
+
+usage
+-----
+
+	import mturk
+	amt = mturk.MTurk(config_name="default")
+
+

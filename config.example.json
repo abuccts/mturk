@@ -1,0 +1,14 @@
+{
+	"default":
+	{
+		"aws_access_key_id": "access_key_id_for_mturk",
+		"aws_secret_access_key": "secret_access_key_for_mturk",
+		"sandbox": true
+	},
+	"dev":
+	{
+		"aws_access_key_id": "access_key_id_for_mturk",
+		"aws_secret_access_key": "secret_access_key_for_mturk",
+		"sandbox": false
+	}
+}
