@@ -2,6 +2,7 @@ from boto3 import client as botoclient
 
 import json
 import lxml.etree as ET
+from io import BytesIO
 
 
 class MTurk(object):
@@ -56,6 +57,19 @@ class MTurk(object):
 			MaxResults=100,
 		)
 		return sorted(response["Qualifications"], key=lambda x: x["GrantTime"])
+
+	
+	def parseAns(self, assignments):
+		ans = {}
+		parser = QAXML("QuestionFormAnswers")
+		for assignment in assignments:
+			kv = parser.getAnswer(assignment["Answer"])
+			for k in kv:
+				if k in ans.keys():
+					ans[k].append(kv[k])
+				else:
+					ans[k] = [kv[k]]
+		return ans
 
 
 
@@ -140,6 +154,21 @@ class QAXML(object):
 		qualification = ET.SubElement(self.xml, "QualificationValueMapping")
 		percentage = ET.SubElement(qualification, "PercentageMapping")
 		ET.SubElement(percentage, "MaximumSummedScore").text = str(scoresum)
+
+
+	def getAnswer(self, ansxml):
+		ansxml = str.encode(ansxml)
+		assert self.schema == "QuestionFormAnswers"
+		assert ET.XML(ansxml).tag == "{{{}}}{}".format(self.schema_namespace[self.schema], self.schema)
+		ans = {}
+		for _, element in ET.iterparse(
+			BytesIO(ansxml),
+			tag = "{{{}}}{}".format(self.schema_namespace[self.schema], "Answer")
+		):
+			identifier = "{{{}}}{}".format(self.schema_namespace[self.schema], "QuestionIdentifier")
+			ans[element.findtext(identifier)] = element[1].text
+			element.clear()
+		return ans
 
 
 	def toString(self):
